@@ -1,7 +1,7 @@
 import  {useState, ReactElement} from "react"
 import {FaSortDown, FaCaretLeft} from 'react-icons/fa'
 import {HiOutlineXMark} from 'react-icons/hi2'
-import {styled } from 'styled-components'
+import { styled} from 'styled-components'
 
 export type SelectOption = {
     label : string
@@ -13,26 +13,34 @@ type singleValueProps = {
     onChange: (e:SelectOption) => void
 }
 
+
 type multipleValueProps = {
     multiple : true
     value : SelectOption[] | null
     onChange: (e:SelectOption[]) => void
 }
 type SelectProps = {
+    label: string,
     options : SelectOption[]
 }&(singleValueProps | multipleValueProps)
 
-const Select = ({multiple,options , value,onChange}: SelectProps) =>{
+const Select = ({label,multiple,options , value,onChange}: SelectProps) =>{
+
     const onSelectOption = (option: SelectOption)=>{
+        
         if(multiple)
-            if(value && value?.length < 3 || value === null)
+            if(value && value?.length < 2 || value === null)
                 onChange(value ? [...value, option] : [option])
+            else{
+                setWarning('Select limit is 2')
+            }
         if(!multiple)
             onChange(option)
         setIsOpen(false)
     }
 
     const removeSelect = (select : SelectOption)=>{
+        setWarning('')
        if(multiple && value) onChange([...value.filter(v => v !== select)])
     }
 
@@ -54,9 +62,11 @@ const Select = ({multiple,options , value,onChange}: SelectProps) =>{
         )
     }
     const [isOpen, setIsOpen] = useState(false)
+    const [warning, setWarning] = useState<string>('') 
     return(
         <SelectContainer>
-            <Display>
+            <p>{label}</p>
+            <Display $active={isOpen}>
                {multiple ? (!value  ? 'Select' : RenderChips(value)) : (value ? value?.label : 'Select')}
             <button onClick={()=> setIsOpen(!isOpen)}>{isOpen ? <FaSortDown/> : <FaCaretLeft/>}  </button>
             </Display>
@@ -76,6 +86,7 @@ const Select = ({multiple,options , value,onChange}: SelectProps) =>{
                     </Option>)  
                 }) }
             </Options>:''}
+            {warning}
         </SelectContainer>
     )
 }
@@ -91,24 +102,29 @@ const SelectContainer = styled.div`
     position: relative;
     width:354px;
     margin: auto;
+    color: ${props=>props.theme.text};
 `
 
-const Display = styled.div`
+const Display = styled.div<{$active? :boolean;}>`
     padding: 0 8px;
     display: flex;
     height: 46px;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid #C7D1DB;
+    border: 1.5px solid ${props => props.$active ? props.theme.borderDark :props.theme.border};
+    box-shadow: ${props => props.$active ? '0 0 0 2px ' + props.theme.shadow  : 'none'};
+    background: ${props => props.theme.background};
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
+    transition: all 0.2s ease;
 
     button{
         border: none;
         background-color: inherit;
         cursor: pointer;
+        color: ${props => props.theme.text}
         
     }
 `
@@ -122,7 +138,8 @@ const Chip = styled.div`
     height: 32px;
     display: flex;
     align-items: center;
-    border: 1px solid #C7D1DB;
+    border: 1.5px solid ${props => props.theme.border};
+    background: ${props => props.theme.background};
     border-radius: 8px;
     margin-left: 8px;
     &:first-child{
@@ -143,7 +160,7 @@ const Chip = styled.div`
     }
 `
 const Options = styled.div`
-    border: 1px solid #C7D1DB;
+    border: 1.5px solid ${props => props.theme.border};
     position: absolute;
     width: 100%;
     z-index: 2;
@@ -154,10 +171,10 @@ const Options = styled.div`
 `
 const Option  = styled.div<{ $selected?: boolean;}>`
     padding:12px;
-    border-bottom: 1px solid #C7D1DB;
-    background-color: ${props => props.$selected ? "#DEE4EA" : "white"};
+    border-bottom: 1.5px solid ${props => props.theme.border};
+    background-color: ${props => props.$selected ? props.theme.selected : props.theme.background};
     &:hover{
-        background-color: #f0f1f3;
+        background-color: ${props => props.theme.hover};
         
     }
     &:first-child{
