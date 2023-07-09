@@ -1,6 +1,7 @@
 import { useState } from "react"
+import {BsFillSunFill,BsMoon} from 'react-icons/bs'
 import Select,{SelectOption} from "./assets/components/Select"
-import { ThemeProvider, styled } from "styled-components"
+import { ThemeProvider, styled} from "styled-components"
 import { light,dark } from "./GlobalStyles"
 
 
@@ -20,7 +21,9 @@ const App = () => {
     <ThemeProvider theme={theme}>
     <Body>
       <Header>
-        <button onClick={()=> setTheme(prev => prev === light ? dark : light)}>theme change</button>
+        <button onClick={()=> setTheme(prev => prev === light ? dark : light)}>{
+          theme=== light? <BsFillSunFill/> :<BsMoon/>
+        }</button>
         </Header>
       <Content>
       <Select label="single-Select"  options={options} value={value} onChange={(e : SelectOption)=>setValue(e)}/>
@@ -47,6 +50,16 @@ const Header = styled.div`
   height: 10%;
   background-color: ${props=> props.theme.background};
   width: 100%;
+
+  button{
+    background-color: inherit;
+    font-size: 24px;
+    color: ${props => props.theme.text};
+    padding: 6px;
+    outline: none;
+    border: none;
+    cursor: pointer;
+  }
 `
 
 const Content = styled.div `
